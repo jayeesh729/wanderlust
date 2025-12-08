@@ -3,7 +3,9 @@ const app = express();
 const mongoose = require("mongoose");
 
 const Listing = require("./models/listing.js");
-
+const Review = require("./models/review.js");
+const session = require("express-session");
+const flash = require("connect-flash");
 
 const path = require("path");
 const methodOverride = require("method-override");
@@ -11,12 +13,9 @@ const ejsMate = require('ejs-mate');
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js");
 const { listingSchema, reviewSchema } = require("./schema.js");
-const Review = require("./models/review.js");
 
 const listings = require("./routes/listings.js");
 const reviews = require("./routes/reviews.js");
-
-
 app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"views"));
 
@@ -44,24 +43,30 @@ app.listen(8080, ()=>{
     console.log("server is listening to port 8080");
 });
 
+const sessionOptions = {
+    secret: "thisIsaSecret",
+    resave:false,
+    saveUninitialized: true,
+    cookie : {
+        expires : Date.now() + 7 *24*60*60*1000,
+        maxAge : 7 *24*60*60*1000,
+    },
+    httpOnly : true,
+};
 
 app.get("/",(req,res)=>{
     res.send("connected");
 });
 
+app.use(session(sessionOptions));
+app.use(flash());
 
 
-// app.get("/test",async (req,res)=>{
-//     let sampleListing = new Listing({
-//         title: "My new Vile ",
-//         description: "By the beach",
-//         price: 1200,
-//         country: "India",
-//     });
-//     await sampleListing.save();
-//     console.log("saved ");
-//     res.send("successful testing");
-// });
+app.use((req,res,next)=>{
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    next();
+});
 
 app.use("/listings",listings);
 app.use("/listings/:id/reviews",reviews)
