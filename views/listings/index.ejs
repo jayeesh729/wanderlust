@@ -1,22 +1,157 @@
 <% layout("/layouts/boilerplate.ejs")%>
-<h1>All listings</h1>
-    <!-- <form methode="GET" action="/listings/new">
+<!-- <h1>All listings</h1> -->
+<!-- <form methode="GET" action="/listings/new">
         <button>Create New Listing</button>
     </form> -->
-    <div class="row row-cols-lg-3 row-cols-md-3 row-cols-sm-3">
-        <% for(let listing of allListings){ %>
-                <a href="/listings/<%=listing.id %>" class="listing-link">
-                    <div class="card col listing-card">
-                        <img class="card-img-top" src="<%= listing.image %>" alt="lisiting image" Style=height:20rem>
-                        <div class="card-img-overlay"></div>
-                        <div class="card-body">
-                            <p class="card-text">
-                                <b><%= listing.title %><br></b>
-                                &#8377;<%= listing.price.toLocaleString("en-IN") %>/night
-                            </p>
-                        </div>
-                    </div>
-                </a>
-        <% } %>
-    </div>
 
+<style>
+  #filters {
+    display: flex;
+    align-items: center;
+  }
+
+  .filter {
+    text-align: center;
+    margin-right: 1.5rem;
+    margin-top: 1.5rem;
+    opacity: 0.7;
+  }
+
+  .filter:hover {
+    opacity: 1;
+    cursor: pointer;
+  }
+
+  .filter p {
+    font-size: 0.8rem;
+  }
+
+  .tax-info {
+    display: none;
+  }
+  .tax-toggle {
+    border: 1px solid black;
+    border-radius: 1rem;
+    height: 3.25rem;
+    padding: 1rem;
+    margin-left: 5rem;
+    display: flex;
+    align-items: center;
+  }
+</style>
+
+<div id="filters">
+  <div class="filter">
+    <div>
+      <i class="fa-solid fa-fire"></i>
+    </div>
+    <p>Trending</p>
+  </div>
+
+  <div class="filter">
+    <div><i class="fa-solid fa-hotel"></i></div>
+    <p>Hotel</p>
+  </div>
+
+  <div class="filter">
+    <i class="fa-solid fa-mountain-city"></i>
+    <p>Iconic cities</p>
+  </div>
+
+  <div class="filter">
+    <i class="fa-solid fa-umbrella-beach"></i>
+    <p>Beach</p>
+  </div>
+
+  <div class="filter">
+    <i class="fa-solid fa-mountain"></i>
+    <p>Mountain</p>
+  </div>
+
+  <div class="filter">
+    <i class="fa-solid fa-person-swimming"></i>
+    <p>Pools</p>
+  </div>
+
+  <div class="filter">
+    <i class="fa-brands fa-fort-awesome"></i>
+    <p>Castles</p>
+  </div>
+
+  <div class="filter">
+    <i class="fa-solid fa-person-hiking"></i>
+    <p>Hiking</p>
+  </div>
+
+  <div class="filter">
+    <i class="fa-solid fa-campground"></i>
+    <p>Camping</p>
+  </div>
+
+  <div class="filter">
+    <i class="fa-solid fa-tractor"></i>
+    <p>Farms</p>
+  </div>
+
+  <div class="filter">
+    <i class="fa-solid fa-snowman"></i>
+    <p>Artic</p>
+  </div>
+
+  <div class="filter">
+    <i class="fa-solid fa-sailboat"></i>
+    <p>Boat</p>
+  </div>
+
+  <div class="tax-toggle">
+    <div class="form-check form-switch form-check-reverse">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        role="switch"
+        id="flexSwitchCheckDefault"
+      />
+      <label class="form-check-label" for="flexSwitchCheckDefault"
+        >Dispalay total after taxes</label
+      >
+    </div>
+  </div>
+</div>
+
+<div class="row row-cols-lg-3 row-cols-md-3 row-cols-sm-3 mt-3">
+  <% for(let listing of allListings){ %>
+  <a href="/listings/<%=listing.id %>" class="listing-link">
+    <div class="card col listing-card">
+      <img
+        class="card-img-top"
+        src="<%= listing.image.url %>"
+        alt="lisiting image"
+        Style="height:20rem"
+      />
+      <div class="card-img-overlay"></div>
+      <div class="card-body">
+        <p class="card-text">
+          <b><%= listing.title %><br /></b>
+          &#8377;<%= listing.price.toLocaleString("en-IN") %>/night
+          <i class="tax-info">+&nbsp;18% GST</i>
+        </p>
+      </div>
+    </div>
+  </a>
+  <% } %>
+</div>
+
+<script>
+  let priceSwitch = document.getElementById("flexSwitchCheckDefault");
+  priceSwitch.addEventListener("click", () => {
+    console.log("Clicked");
+    let tax = document.getElementsByClassName("tax-info");
+    for (info of tax) {
+      if (info.style.display != "inline") {
+        info.style.display = "inline";
+      } else {
+        info.style.display = "none";
+      }
+    }
+  });
+</script>

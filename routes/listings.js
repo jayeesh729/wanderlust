@@ -1,8 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
+const multer = require("multer");
+const { storage } = require("../cloudConfig.js");
+const upload = multer({ storage });
 
-const { isLoggedIn , isOwner , validateListing } = require("../middleware.js");
+const { isLoggedIn, isOwner, validateListing } = require("../middleware.js");
 
 const wrapAsync = require("../utils/wrapAsync.js");
 const ExpressError = require("../utils/ExpressError.js");
@@ -11,27 +14,36 @@ const { listingSchema, reviewSchema } = require("../schema.js");
 
 const listingController = require("../controllers/listings.js");
 
-
-//HOME ROUTE or Index Route
-router.get("/", wrapAsync(listingController.index));
-
+router
+  .route("/")
+  .get(wrapAsync(listingController.index))
+  .post(
+    isLoggedIn,
+    upload.single("listing[image]"),
+    validateListing,
+    wrapAsync(listingController.CreateListing)
+  );
 
 //new route get /lisitings/new ->form ->submit
-router.get("/new",isLoggedIn, listingController.renderNewForm );
+router.get("/new", isLoggedIn, listingController.renderNewForm);
 
-//Create Route
-router.post("/",isLoggedIn, validateListing, wrapAsync(listingController.CreateListing ));
+router
+  .route("/:id")
+  .get(wrapAsync(listingController.ShowListing))
+  .put(
+    isLoggedIn,
+    isOwner,
+    upload.single("listing[image]"),
+    validateListing,
+    wrapAsync(listingController.updateListing)
+  )
+  .delete(isLoggedIn, isOwner, wrapAsync(listingController.destroyListings));
 
 //Edit Route
-router.get("/:id/edit" ,isLoggedIn , wrapAsync(listingController.renderEditForm ));
-
-//UPDATE ROUTE
-router.put("/:id",isLoggedIn, isOwner, validateListing, wrapAsync( listingController.updateListing ));
-
-//DELETE 
-router.delete("/:id",isLoggedIn , isOwner, wrapAsync( listingController.destroyListings ));
-
-//show route
-router.get("/:id", wrapAsync( listingController.ShowListing));
+router.get(
+  "/:id/edit",
+  isLoggedIn,
+  wrapAsync(listingController.renderEditForm)
+);
 
 module.exports = router;
